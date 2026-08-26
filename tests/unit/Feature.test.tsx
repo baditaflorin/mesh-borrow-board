@@ -9,8 +9,7 @@ describe("borrow board", () => {
     expect(validItem({ id: "a", title: "Drill", ownerId: "p", createdAt: 1 })).toBe(true));
   it("renders shelf", () => {
     render(<Feature room={createMockRoom()} config={config} />);
-    expect(
-      screen.getByRole("heading", { name: "Borrow useful things, without a middleman." }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Borrow well. Return trust." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "List item" })).toBeInTheDocument();
   });
 });
