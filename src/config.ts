@@ -2,6 +2,7 @@ import { createMeshConfig } from "@baditaflorin/mesh-common";
 
 export const config = createMeshConfig({
   appName: "mesh-borrow-board",
+  breadcrumbs: false,
   displayName: "Borrow Board",
   description: "A browser-local lending board for things neighbours can borrow and return.",
   visualProfile: "utility",
