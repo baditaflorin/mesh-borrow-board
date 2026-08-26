@@ -1,0 +1,164 @@
+{
+  "app": "mesh-borrow-board",
+  "completedAt": "2026-08-26T00:44:53.598Z",
+  "totalChecks": 16,
+  "passed": 16,
+  "failed": 0,
+  "entries": [
+    {
+      "id": "L1.IDENTITY.persists",
+      "claim": "Identity key persists across reloads via localStorage",
+      "method": "loadOrCreateIdentity called twice with same prefix; both keypairs match",
+      "evidence": {
+        "pubkeyA": "f9d92ea0664f27408580a2307a8425a49b536a9235cd4ef8072c8eca1b937141",
+        "pubkeyB": "f9d92ea0664f27408580a2307a8425a49b536a9235cd4ef8072c8eca1b937141"
+      },
+      "result": "pass",
+      "ts": 1787705093507
+    },
+    {
+      "id": "L1.IDENTITY.uniquePerApp",
+      "claim": "Each storagePrefix produces a distinct keypair (no cross-app reuse)",
+      "method": "loadOrCreateIdentity with two different prefixes; private keys differ",
+      "evidence": {
+        "pubkeyA": "50c706d1e832159c",
+        "pubkeyB": "7d82fb504ba2bc00"
+      },
+      "result": "pass",
+      "ts": 1787705093509
+    },
+    {
+      "id": "L1.MODERATOR.claimSyncs",
+      "claim": "A claims moderator → B's hook reports A as current moderator",
+      "method": "linkMockRooms relays Y.Doc updates; A.claim() then read on B",
+      "evidence": {
+        "claimer": "alice",
+        "ttlMs": 1800000
+      },
+      "result": "pass",
+      "ts": 1787705093559
+    },
+    {
+      "id": "L1.MODERATOR.expiredClaimIgnored",
+      "claim": "A signed claim with expiresAt in the past is treated as vacant",
+      "method": "Plant claim with expiresAt = now - 60s; hook reports current=null",
+      "evidence": {
+        "plantedExpiresAt": 1787705033592,
+        "now": 1787705093595
+      },
+      "result": "pass",
+      "ts": 1787705093595
+    },
+    {
+      "id": "L1.MODERATOR.forgedClaimRejected",
+      "claim": "A claim with a signature not matching its embedded pubkey is treated as vacant",
+      "method": "Plant {pubkey:real, sig:forger}; hook rejects and reports current=null",
+      "evidence": {
+        "realPubkey": "d7d9f483b180b723",
+        "forgerPubkey": "49018f78559136ef"
+      },
+      "result": "pass",
+      "ts": 1787705093598
+    },
+    {
+      "id": "L1.MODERATOR.releaseSyncs",
+      "claim": "Relinquish by the current moderator clears the slot for all peers",
+      "method": "After A.relinquish() both A and B observe current=null",
+      "result": "pass",
+      "ts": 1787705093591
+    },
+    {
+      "id": "L1.MODERATOR.signedClaim",
+      "claim": "The moderator claim's signature verifies against the embedded pubkey",
+      "method": "verify({peerId,pubkey,claimedAt,expiresAt,nonce}, sig, pubkey) === true",
+      "evidence": {
+        "sigLen": 128,
+        "nonceLen": 32
+      },
+      "result": "pass",
+      "ts": 1787705093568
+    },
+    {
+      "id": "L1.MODERATOR.vacantDefault",
+      "claim": "Fresh room reports no moderator and isMe=false",
+      "method": "useModerator hook on a fresh mock room returns {current:null, isMe:false}",
+      "result": "pass",
+      "ts": 1787705093541
+    },
+    {
+      "id": "L1.SIGN.rejectGarbage",
+      "claim": "Invalid signature / pubkey inputs return false instead of crashing",
+      "method": "verify({x:1}, 'not-hex', 'also-bad') and verify({x:1}, '', '') both false",
+      "result": "pass",
+      "ts": 1787705093520
+    },
+    {
+      "id": "L1.SIGN.rejectTampered",
+      "claim": "A signed payload with any byte modified fails verification",
+      "method": "Sign {msg:'hello'}, then verify({msg:'HELLO'}, …) returns false",
+      "result": "pass",
+      "ts": 1787705093517
+    },
+    {
+      "id": "L1.SIGN.rejectWrongKey",
+      "claim": "A's signature does not verify under B's public key",
+      "method": "Sign with kpA.priv, verify with kpB.pub returns false",
+      "result": "pass",
+      "ts": 1787705093520
+    },
+    {
+      "id": "L1.SIGN.roundtrip",
+      "claim": "A signed payload verifies against the matching pubkey",
+      "method": "Ed25519 sign(payload, privkey) then verify(payload, sig, pubkey)",
+      "evidence": {
+        "sigLen": 128,
+        "pubkeyPrefix": "e1317b0314f10c3a"
+      },
+      "result": "pass",
+      "ts": 1787705093512
+    },
+    {
+      "id": "L1.TOFU.fingerprint",
+      "claim": "trustFingerprint emits a 4x2-hex grouped string for in-person verification",
+      "method": "fingerprint(peerId, pubkey) matches /^xx-xx-xx-xx$/",
+      "evidence": {
+        "fingerprint": "7d-f5-0f-23"
+      },
+      "result": "pass",
+      "ts": 1787705093521
+    },
+    {
+      "id": "L1.TOFU.peerIdFromPubkey",
+      "claim": "peerIdFromPubkey is deterministic and uses 64-bit prefix of pubkey",
+      "method": "Two calls with same pubkey return the same 16-hex-char id",
+      "evidence": {
+        "peerId": "19231a34ca0acc4f"
+      },
+      "result": "pass",
+      "ts": 1787705093520
+    },
+    {
+      "id": "L1.TOFU.register",
+      "claim": "register() writes a self-signed PubkeyRecord into the registry Y.Map",
+      "method": "Verify the stored record's signature against its own pubkey",
+      "evidence": {
+        "peerId": "alice",
+        "pubkeyPrefix": "1e10ff212462cc97",
+        "sigLen": 128
+      },
+      "result": "pass",
+      "ts": 1787705093534
+    },
+    {
+      "id": "L1.TOFU.rejectImposter",
+      "claim": "A forged record signed by the wrong key does not block the real peer from publishing",
+      "method": "Pre-write mallory-signed alice claim; alice arrives and overwrites with her own",
+      "evidence": {
+        "forgedPubkey": "ebbf223d0090c19c",
+        "realPubkey": "139f51170d7bbd50"
+      },
+      "result": "pass",
+      "ts": 1787705093539
+    }
+  ]
+}
